@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: learn-springboot
+
+  # ===== 数据库配置 =====
+  datasource:
+    url: jdbc:mysql://localhost:3306/learn_db?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# ===== 启动端口 =====
+server:
+  port: 8080
