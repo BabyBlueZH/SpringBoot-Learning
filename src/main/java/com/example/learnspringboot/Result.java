@@ -30,6 +30,7 @@ public class Result<T> {
      * 成功：有返回数据
      */
     public static <T> Result<T> success(T data) {
+
         return new Result<>(200, "success", data);
     }
 
@@ -37,6 +38,7 @@ public class Result<T> {
      * 成功：无返回数据（比如删除成功）
      */
     public static <T> Result<T> success() {
+
         return new Result<>(200, "success", null);
     }
 
