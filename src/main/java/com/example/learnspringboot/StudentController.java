@@ -1,9 +1,23 @@
 package com.example.learnspringboot;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+//POST /api/students  请求体: {"name": "", "score": null}
+//  ↓
+//@Valid 触发校验
+//  ↓
+//name 为空 → @NotBlank 不通过
+//score 为 null → @NotNull 不通过
+//  ↓
+//抛出 MethodArgumentNotValidException
+//  ↓
+//GlobalExceptionHandler.handleValidation() 接住
+//  ↓
+//返回 Result(code=400, message="name: 姓名不能为空; score: 分数不能为空")
 
 // @RestController 的意思是：把这个类标记为一个 RESTful API 控制器。
 // 有了它，类里面的方法就能处理 HTTP 请求并返回 JSON 数据。
@@ -57,6 +71,7 @@ public class StudentController {
     // POST /api/students  + 请求体 {"name":"小李","score":95}
     @PostMapping
     public Result<Student> add(@RequestBody @Valid Student student) {
+        //                                   ↑ 这个 @Valid 是关键！没有它校验不生效
         // save 是 CrudRepository 自带的，新增一条数据
         Student saved = studentRepository.save(student);
         return Result.success(saved);

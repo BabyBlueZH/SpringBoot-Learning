@@ -8,6 +8,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
+//执行流程：
+//
+//请求进来 → Controller 报错
+//  ↓
+//抛出 BusinessException(404, "学生不存在")
+//  ↓
+//GlobalExceptionHandler 扫描到 @ExceptionHandler(BusinessException.class) 匹配
+//  ↓
+//返回 Result(code=404, message="学生不存在")
+
 /**
  * 全局异常处理器
  * <p>
@@ -24,7 +34,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusiness(BusinessException e) {
+
         return Result.error(e.getCode(), e.getMessage());
+        // 把 BusinessException 转成 Result(code, message, null)
     }
 
     /**
@@ -36,6 +48,7 @@ public class GlobalExceptionHandler {
         String msg = e.getBindingResult().getFieldErrors().stream()
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining("; "));
+        // 把每个字段的错误拼成： "name: 姓名不能为空; score: 分数不能为空"
         return Result.badRequest(msg);
     }
 
@@ -45,7 +58,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<Void> handleException(Exception e) {
-        log.error("系统异常", e);
-        return Result.serverError("服务器内部错误");
+        log.error("系统异常", e);// 打印堆栈给开发者看
+        return Result.serverError("服务器内部错误");// 不暴露堆栈给前端
     }
 }
