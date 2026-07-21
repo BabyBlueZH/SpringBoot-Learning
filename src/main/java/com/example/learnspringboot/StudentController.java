@@ -1,5 +1,6 @@
 package com.example.learnspringboot;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,12 +46,8 @@ public class StudentController {
     // GET /api/students/3  → id = 3
     @GetMapping("/{id}")
     public Result<Student> getById(@PathVariable Long id) {
-        // findById 是 CrudRepository 自带的，根据主键查一条数据
-        // orElse(null) 的意思是：如果没找到就返回 null
-        Student student = studentRepository.findById(id).orElse(null);
-        if (student == null) {
-            return Result.notFound("学生不存在，id: " + id);
-        }
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(404, "学生不存在，id: " + id));
         return Result.success(student);
     }
 
@@ -59,8 +56,22 @@ public class StudentController {
     // @RequestBody 的意思是：从 HTTP 请求体里读取 JSON，自动转换成 Student 对象
     // POST /api/students  + 请求体 {"name":"小李","score":95}
     @PostMapping
-    public Result<Student> add(@RequestBody Student student) {
+    public Result<Student> add(@RequestBody @Valid Student student) {
         // save 是 CrudRepository 自带的，新增一条数据
+        Student saved = studentRepository.save(student);
+        return Result.success(saved);
+    }
+
+    // ==================== 更新 ====================
+    // PUT /api/students/1  + 请求体 {"name":"小张","score":88}
+    // PUT 是全量更新：传来的字段会覆盖数据库里的全部字段
+    @PutMapping("/{id}")
+    public Result<Student> update(@PathVariable Long id, @RequestBody @Valid Student student) {
+        // 先查一下，不存在就抛业务异常（全局异常处理器会接住）
+        studentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(404, "学生不存在，id: " + id));
+        // 设置 id 确保更新的是这条记录
+        student.setId(id);
         Student saved = studentRepository.save(student);
         return Result.success(saved);
     }
@@ -72,7 +83,7 @@ public class StudentController {
     public Result<Void> delete(@PathVariable Long id) {
         // 先检查存在不存在
         if (!studentRepository.existsById(id)) {
-            return Result.notFound("学生不存在，id: " + id);
+            throw new BusinessException(404, "学生不存在，id: " + id);
         }
         // deleteById 是 CrudRepository 自带的，根据主键删除
         studentRepository.deleteById(id);
