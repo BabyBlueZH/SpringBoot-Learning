@@ -1,5 +1,6 @@
 package com.example.learnspringboot;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * 全局异常处理器
  * <p>
  * 统一拦截所有 Controller 抛出的异常，返回 {@link Result} 格式。
- * 这样前端收到的错误信息也是统一结构，不用每种异常单独处理。
+ * 这样前端收到的错误信息也0.是统一结构，不用每种异常单独处理。
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +32,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 业务异常 —— 自己抛的，有明确的 code 和 message
+     * 现在的 GlobalExceptionHandler 返回的是 Result<Void>，状态码永远 200（因为 Result 对象本身不带 HTTP 状态码）
      */
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusiness(BusinessException e) {
@@ -39,8 +41,19 @@ public class GlobalExceptionHandler {
         // 把 BusinessException 转成 Result(code, message, null)
     }
 
-    /**
-     * 参数校验失败 —— @Valid 校验不通过时会抛出
+//    /**
+//     * 404 —— 请求的接口不存在
+//     * ⚠️ 此方法已暂停：Spring Boot 4.x 废弃了 throw-exception-if-no-handler-found 属性
+//     * 后续学完错误处理再补上
+//     */
+//    @ExceptionHandler(NoHandlerFoundException.class)
+//    public Result<Void> handleNotFound(NoHandlerFoundException e) {
+//        return Result.error(404, "接口不存在: " + e.getRequestURL());
+//    }
+//
+/**
+     * 参数校验失败 —— @Valid
+    校验不通过时会抛出
      * 把每个字段的错误拼接成一条消息
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
