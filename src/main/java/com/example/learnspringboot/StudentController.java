@@ -3,6 +3,7 @@ package com.example.learnspringboot;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -70,8 +71,7 @@ public class StudentController {
     // @RequestBody 的意思是：从 HTTP 请求体里读取 JSON，自动转换成 Student 对象
     // POST /api/students  + 请求体 {"name":"小李","score":95}
     @PostMapping
-    public Result<Student> add(@RequestBody @Valid Student student) {
-        //                                   ↑ 这个 @Valid 是关键！没有它校验不生效
+    public Result<Student> add(@RequestBody @Validated(Student.Create.class) Student student) {
         // save 是 CrudRepository 自带的，新增一条数据
         Student saved = studentRepository.save(student);
         return Result.success(saved);
@@ -81,7 +81,7 @@ public class StudentController {
     // PUT /api/students/1  + 请求体 {"name":"小张","score":88}
     // PUT 是全量更新：传来的字段会覆盖数据库里的全部字段
     @PutMapping("/{id}")
-    public Result<Student> update(@PathVariable Long id, @RequestBody @Valid Student student) {
+    public Result<Student> update(@PathVariable Long id, @RequestBody @Validated(Student.Update.class) Student student) {
         // 先查一下，不存在就抛业务异常（全局异常处理器会接住）
         studentRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(404, "学生不存在，id: " + id));
