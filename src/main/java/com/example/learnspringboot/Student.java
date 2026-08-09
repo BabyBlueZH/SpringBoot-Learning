@@ -5,11 +5,19 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.groups.Default;
 import org.springframework.data.annotation.Id;
 
 public class Student {//加校验注解
 
+    // ============ 分组校验接口 ============
+    public interface Create extends Default {}
+    public interface Update extends Default {}
+
     @Id//这里写id的意思是告诉SpringBoot这个字段是数据库的主键
+    @Null(groups = Create.class)       // 新增时 id 必须为 null
+    @NotNull(groups = Update.class)    // 更新时 id 不能为 null
     private Long id;
 
     @NotBlank(message = "姓名不能为空")//新增：name 不能为 null 或空字符串
