@@ -1,6 +1,14 @@
 package com.example.learnspringboot;
 
-public class User {
+import org.springframework.data.relational.core.mapping.Table;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@TableName("user") // ★ 告诉 MP：这个类对应 user 表
+public class User {// ★ 告诉 MP：id 是主键，且数据库自增
+
+    @TableId(type = IdType.AUTO)
     private Long id;
     private String username;
     private String email;
