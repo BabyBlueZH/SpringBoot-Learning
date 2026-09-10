@@ -24,3 +24,8 @@ public class MyBbatisPlusConfig {//告诉 MyBatis-Plus：以后遇到分页查�
 
 //之前加的：
 //mybatis-plus-jsqlparser依赖，就是给这个分页拦截器解析、改写 SQL 用的。
+//MyBatis-Plus 配置
+//        ↓
+//PaginationInnerInterceptor
+//        ↓
+//真正的数据库分页
