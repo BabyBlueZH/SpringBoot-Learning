@@ -1,8 +1,9 @@
 package com.example.learnspringboot;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import org.springframework.data.domain.Page;
+
 import org.springframework.web.bind.annotation.*;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
 
@@ -57,9 +58,12 @@ public class UserController {
     }
 
     @GetMapping("/page")
-    public Result<Page<User>> page(@RequestParam(defaultValue = "1") long page,
-                                   @RequestParam(defaultValue = "2") long size){
-        Page<User> result = userMapper.selectPage(new Page<>(page,size),null);
+    public Result<Page<User>> page(@RequestParam(defaultValue = "1") long page,//从 URL 里面接收 page 参数,如果你什么都不传：/api/users/page那么默认page = 1
+                                   @RequestParam(defaultValue = "2") long size){//每一页显示多少条数据。
+
+        Page<User> result =
+                userMapper.selectPage(new Page<>(page, size), null);//selectPage(...)，null：没有额外的查询条件。分页查询第page页，每页size条
+
         return Result.success(result);
     }
 }
